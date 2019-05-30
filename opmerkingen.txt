@@ -1,0 +1,1 @@
+Als extra/bonus heb ik de recursieve functie bedacht omvan de linked list het laatste item te krijgen. Hierdoor is geen while(true) loop nodig wat de code netjes en overzichtelijk houdt. 
