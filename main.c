@@ -26,12 +26,15 @@
  *
  */
 int stringlength = 0;
+int cursorposition = 0;
 int lines = 0;
 
 //Writable memory space start and end, NOT THE BLOCKS
 int* stringstart = NULL;
 int* stringend = NULL;
 bool halted = false;
+bool debugkernel =false ;
+
 void main(void)
 {
     vga_clear();
@@ -43,23 +46,33 @@ void main(void)
         char c = ps2_getch();
 
         if(c == '\b'){
-            printf("%c", '\b');
             backspace();
         }
         else if(c == '\n'){
             enter();
+        }else if(c == '\e'){
+            //parseansi();;
+            ps2_getch();
+            char x = ps2_getch();
+            parseansi(x);
         }
         else{
-            stringend = malloc(sizeof(char));
-            if(stringstart == NULL) stringstart = stringend;
-            //set value of stringend to char
-            *stringend = c;
-            printf("%c", *stringend);
-            //alloc new size and set stringend to writable memory space
-            stringlength+=1; 
+            insertchar(c);
         }
+        if(debugkernel == true) debug_kernel();
     }
     printf("\nHalted!");
+}
+
+void insertchar(char c){
+    stringend = malloc(sizeof(char));
+    if(stringstart == NULL) stringstart = stringend;
+    //set value of stringend to char
+    *stringend = c;
+    printf("%c", *stringend);
+    //alloc new size and set stringend to writable memory space
+    stringlength+=1; 
+    cursorposition+=1;
 }
 
 void printbuffer(){
@@ -87,6 +100,18 @@ void enter(){
             printf(" not found!\n");
             clear();
         }
+    }
+}
+
+void parseansi(char x){
+    if(x == 'D' && cursorposition >= 0){
+        struct vga_cursor cursor = {-1, 0};
+        vga_curset(cursor, true);
+        cursorposition-=1;
+    }else if(x == 'C' && cursorposition <= stringlength){
+        struct vga_cursor cursor = {1, 0};
+        vga_curset(cursor, true);
+        cursorposition+=1;
     }
 }
 
@@ -126,7 +151,9 @@ void freeBuffer(struct block *head){
 
 void backspace(){
     //printf("%c", '\b');
-    if(stringlength > 1){
+    cursorposition-=1;
+    if(stringlength > 0){
+        printf("%c", '\b');
         struct block *temp = (void*)stringstart - sizeof(struct block);
 
         for(int i = 0; i < stringlength-1; i++){
@@ -144,5 +171,20 @@ void backspace(){
         struct block *temp = (void*)stringstart - sizeof(struct block);
         free(temp->addr);
         stringlength = 0;
+    }
+}
+
+void debug_kernel(){
+    printf("\n");
+    struct block *temp = (void*)stringstart - sizeof(struct block);
+    int *c = temp->addr;
+    char d = *c;
+    printf("Address: %p, value: %c, used: %d\n", temp, d, temp->used);
+    while(temp->next != NULL){
+        temp = temp->next;
+        int *c = temp->addr;
+        char d = *c;
+        printf("Address: %p, value: %c, used: %d\n", temp, d, temp->used);
+
     }
 }
