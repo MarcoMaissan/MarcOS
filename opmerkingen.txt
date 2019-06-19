@@ -1,1 +1,14 @@
+OPMERKINGEN OPDRACHT 1
+
 Als extra/bonus heb ik de recursieve functie bedacht omvan de linked list het laatste item te krijgen. Hierdoor is geen while(true) loop nodig wat de code netjes en overzichtelijk houdt. 
+
+-----------------------------------
+OPMERKINGEN OPDRACHT 2
+
+Ik weet dat ik de opdracht te laat heb ingeleverd, maar dat komt voornamelijk omdat ik erg veel tijd heb gestoken in iets extra's.
+
+Ik gebruik dynamische geheugenallocatie om mijn string in op te slaan. 
+Veel mensen gebruiken bijvoorbeeld char[50] waardoor je maar 50 chars kan opslaan.
+Ik gebruik de alloc method van opdracht 1 waardoor ik infinite (totdat het werkgeheugen vol zit) char strings kan maken.
+
+Dit betekent ook dat bijvoorbeeld het inserten van chars of backspace middenin een zin veel lastiger was.
