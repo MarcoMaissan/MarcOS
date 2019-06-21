@@ -94,9 +94,9 @@ static void *block_get(size_t n)
             //if no head exists
             return block_alloc(n);
         }else{
-            if(ptr->size == n && ptr->used == false){
+            if(ptr->size >= n && ptr->used == false){
                 ptr->used = true;
-                //regenerate address since it might have been lost on double backspace
+                //regenerate address since reference might got lost for whatever reason
                 ptr->addr = (void*)ptr + sizeof(struct block);
                 //if an unused block is found, return its address
                 return ptr->addr;
@@ -143,7 +143,20 @@ void free(void *ptr)
 
 void *realloc(void *ptr, size_t n)
 {
-    /* TODO */
+    struct block *currentblock = (void*) ptr - sizeof(struct block);
+    if(currentblock->next == NULL){
+        currentblock->size = n;
+        return ptr;
+    }else{
+
+        //Free memory spot
+        //Copy contents to new allocated space
+        void* newaddr = malloc(n);
+
+        memcpy(newaddr, ptr, currentblock->size);
+        free(ptr);
+        return newaddr;
+    }
 }
 
 void *calloc(size_t n, size_t m)
