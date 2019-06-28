@@ -55,7 +55,9 @@ struct file *ramfs_readdir(void)
  */
 ssize_t ramfs_read(struct file *fp, char **data)
 {
-    /* TODO */
+     char* mem = (char*)malloc(fp->size);
+     strcpy(mem, fp->data);
+     *data = mem; 
 }
 
 /*
@@ -66,7 +68,11 @@ ssize_t ramfs_read(struct file *fp, char **data)
  */
 ssize_t ramfs_write(struct file *fp, const char *data, size_t n)
 {
-    /* TODO */
+    const char* mem = (const char*)malloc(n);
+    strcpy(mem, data);
+    fp->data = mem;
+    fp->size = n;
+    printf("%s\n", mem);
 }
 
 /*
@@ -154,4 +160,24 @@ void touch(const char *name){
     printf("\nFile already exists!");
    }
 
+
+}
+
+void cat(const char *name){
+    struct file *f = ramfs_seek(name);
+    if(f != NULL){
+       printf("\n%s", f->data);
+    }
+}
+
+void testdata(){
+    printf("\n");
+    struct file *f1 = ramfs_seek("c");
+    ramfs_write(f1, "Heyyyy", sizeof("Heyyy")+1);
+    
+    //read data test
+    
+    char *datapointer;
+    ramfs_read(f1, &datapointer);
+    printf("%s", datapointer);
 }

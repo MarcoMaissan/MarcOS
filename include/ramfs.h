@@ -47,3 +47,5 @@ void ramfs_remove(struct file *fp);
 void ls();
 void rm();
 void touch(const char *name);
+void cat();
+void testdata();

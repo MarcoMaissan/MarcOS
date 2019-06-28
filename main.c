@@ -170,6 +170,13 @@ void enter(){
         }else if(checkcommand("rm ", 3) == true){
             rm(&string[3]);
             prompt();
+        }else if(checkcommand("cat ", 4) == true){
+            cat(&string[4]);
+            prompt();
+        
+        }else if(checkcommand("td", 2) == true){
+            testdata();
+            prompt();
         } 
         else{
             printf("\nCommand ");
