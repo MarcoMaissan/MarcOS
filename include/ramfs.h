@@ -44,3 +44,6 @@ ssize_t ramfs_write(struct file *fp, const char *data, size_t n);
 
 int ramfs_create(const char *name);
 void ramfs_remove(struct file *fp);
+void ls();
+void rm();
+void touch(const char *name);

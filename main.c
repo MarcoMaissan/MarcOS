@@ -2,6 +2,7 @@
 #include <sys/print.h>
 #include <sys/vga.h>
 #include <sys/ps2.h>
+#include <ramfs.h>
 /*
  *
  * MarcOS
@@ -160,6 +161,15 @@ void enter(){
         else if(checkcommand("echo ",5) == true){
             echo();
             prompt(); 
+        }else if(checkcommand("touch ",6) == true){
+            touch(&string[6]);
+            prompt();
+        }else if(checkcommand("ls", 2) == true){
+            ls();
+            prompt();
+        }else if(checkcommand("rm ", 3) == true){
+            rm(&string[3]);
+            prompt();
         } 
         else{
             printf("\nCommand ");

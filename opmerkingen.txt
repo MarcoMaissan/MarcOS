@@ -11,4 +11,5 @@ Ik gebruik dynamische geheugenallocatie om mijn string in op te slaan.
 Veel mensen gebruiken bijvoorbeeld char[50] waardoor je maar 50 chars kan opslaan.
 Ik gebruik de alloc method van opdracht 1 waardoor ik infinite (totdat het werkgeheugen vol zit) char strings kan maken.
 
-Dit betekent ook dat bijvoorbeeld het inserten van chars of backspace middenin een zin veel lastiger was.
+Dit betekende ook dat ik de optionele realloc functie heb geimplementeerd.
+

@@ -23,19 +23,28 @@
  */
 
 #include <ramfs.h>
+#include <alloc.h>
 
 static struct file *head;
+bool debugram = false;
 
 /* Seek for files by 'name' */
 struct file *ramfs_seek(const char *name)
 {
-	/* TODO */
+    struct file *temp = head;
+    while(temp != NULL){
+        if(strcmp(temp->name, name) == 0){
+            return temp;
+        }
+        temp = temp->next;
+    }
+    return NULL;
 }
 
 /* Return the head of the file list */
 struct file *ramfs_readdir(void)
 {
-	return head;
+    return head;
 }
 
 /*
@@ -46,7 +55,7 @@ struct file *ramfs_readdir(void)
  */
 ssize_t ramfs_read(struct file *fp, char **data)
 {
-	/* TODO */
+    /* TODO */
 }
 
 /*
@@ -57,7 +66,7 @@ ssize_t ramfs_read(struct file *fp, char **data)
  */
 ssize_t ramfs_write(struct file *fp, const char *data, size_t n)
 {
-	/* TODO */
+    /* TODO */
 }
 
 /*
@@ -70,11 +79,79 @@ ssize_t ramfs_write(struct file *fp, const char *data, size_t n)
  */
 int ramfs_create(const char *name)
 {
-	/* TODO */
+    //allocate new file
+    void* allocatedfile = malloc(sizeof(struct file));
+
+    //set file properties
+    struct file* newfile = (struct file*) allocatedfile;
+    strcpy(newfile->name, name);
+    newfile->prev = newfile->next = NULL;
+    newfile->data = NULL;
+    newfile->size = 0;
+
+    //if head exists, set head. Otherwise set as last from list
+    if(head == NULL){
+        head = newfile;
+    }else{
+        struct file *temp = head;
+        while(temp->next != NULL){
+            temp = temp->next;
+        }
+        temp->next = newfile;
+        newfile->prev = temp;
+    }
+
+    if (debugram == true) { 
+        ls();
+    }
+    return 0;
 }
 
 /* Remove a file and it's data */
 void ramfs_remove(struct file *fp)
 {
-	/* TODO */
+    //free the memory block
+    free((void*)fp);
+    if(fp->prev == NULL && fp->next == NULL){
+        //only item in list
+        head = NULL;
+    }
+    else if(fp->prev == NULL){
+        //its the head, so change it
+        head = fp->next; //either null or next block
+    }
+    else if(fp->next == NULL){
+        //end of list -> set next of previous to null
+        fp->prev->next = NULL;
+    }else{
+        //the previous' items next item is fp->next
+        fp->prev->next = fp->next;
+        //the next item's previous one will be fp->prev
+        fp->next->prev = fp->prev;
+    }
+}
+
+void ls(){
+    struct file *temp = head;
+    while (temp != NULL){
+        printf("\n%s",temp->name);
+        if(debugram) {printf("\nprev %p, mine %p, next %p",temp->prev, temp, temp->next);}
+        temp = temp->next;
+    }   
+}
+
+void rm(char* file){
+    struct file *f = ramfs_seek(file);
+    if(f != NULL){
+    ramfs_remove(f);
+    }
+}
+
+void touch(const char *name){
+   if(ramfs_seek(name) == NULL){
+    ramfs_create(name);
+   }else{
+    printf("\nFile already exists!");
+   }
+
 }
