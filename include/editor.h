@@ -25,3 +25,15 @@
 #pragma once
 
 void editor(const char *name);
+void loadfile(const char *name);
+void parsechar();
+void backspace();
+void gotoline(int n);
+void move(int x, int y);
+void calculateline(int currentline);
+void insertcharinstring(char c);
+void redraw();
+void parsectrl();
+void parseenter(char c);
+void gotostrpos();
+void del();

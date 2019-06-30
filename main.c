@@ -3,6 +3,7 @@
 #include <sys/vga.h>
 #include <sys/ps2.h>
 #include <ramfs.h>
+#include <editor.h>
 /*
  *
  * MarcOS
@@ -41,6 +42,12 @@ bool debugkernel =false;
     
 void main(void)
 {
+    //Make example file
+    touch("lorem");
+    struct file *f = ramfs_seek("lorem");
+    ramfs_write(f, "Dit is een test met een hele erge onwijs lange string maar echt eentje die heeeel erg lang is.\nHallo\nDag", 200); 
+
+
     vga_clear();
     prompt();
     string = head = malloc(sizeof(char) * allocsize);
@@ -177,7 +184,11 @@ void enter(){
         }else if(checkcommand("td", 2) == true){
             testdata();
             prompt();
-        } 
+        }
+        else if(checkcommand("vim ",4) == true){
+            editor(&string[4]);
+            clear();
+        }
         else{
             printf("\nCommand ");
             printbuffer();
