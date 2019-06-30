@@ -5,6 +5,7 @@
 
 bool exit = false;
 struct file *f;
+char *buffer;
 int curx, cury;
 int amountOfLines;
 int currentline;
@@ -25,19 +26,18 @@ void editor(const char *name)
 
 void loadfile(const char *name){
     move(0,0,false);
-        f = ramfs_seek(name);
-    if(f != NULL){
-        printf("%s", f->data);
-    }else{
+    f = ramfs_seek(name);
+    if(f == NULL){
         touch(name);
         f = ramfs_seek(name);
         ramfs_write(f, "\0", 2);
     }
+    buffer = malloc(strlen(f->data)+1);//----
+    ramfs_read(f, &buffer);
+    printf("%s",buffer);
 }
 
 void parsechar(){
-
-
     char c = ps2_getch();
 
     //Check for backspace, enter, arrow or char.
@@ -67,16 +67,14 @@ void insertcharinstring(char c){
     //realloc data
 
 
-    void* ptr = realloc(f->data, f->size+1);
-    f->data = ptr;
-    f->size = f->size+1;
-
-
+    char* ptr = realloc(buffer, strlen(buffer)+2);
+    buffer = ptr;
+    f->size = strlen(buffer)+2;
 
     for(int i = f->size-1; i >= strpos; i--){
-        f->data[i+1] = f->data[i];
+        buffer[i+1] = buffer[i];
     } 
-    f->data[strpos] = c; 
+    buffer[strpos] = c; 
     strpos++;
 
     redraw();
@@ -91,7 +89,7 @@ void parsearrows(char x){
         //left
         move(-1, 0, true);
         strpos--;
-    }else if(x == 'C' && f->data[strpos] != '\n' && f->data[strpos] != '\0'){
+    }else if(x == 'C' && buffer[strpos] != '\n' && buffer[strpos] != '\0'){
         //right
         move(1, 0, true);
         strpos++;
@@ -110,13 +108,13 @@ void parsearrows(char x){
 void back(){
     if(strpos > 0){
         int i = strpos;
-        char c = f->data[i];
+        char c = buffer[i];
         while(c != '\0'){
-            f->data[i-1] = f->data[i];
+            buffer[i-1] = buffer[i];
             i++;
-            c = f->data[i];
+            c = buffer[i];
         }
-        f->data[i-1] = '\0';
+        buffer[i-1] = '\0';
         f->size--;
         strpos--;
         vga_clear();
@@ -126,15 +124,15 @@ void back(){
 }
 
 void del(){
-    if(strpos > 0){
+    if(strlen(buffer) > 0){
         int i = strpos;
-        char c = f->data[i];
+        char c = buffer[i];
         while(c != '\0'){
-            f->data[i] = f->data[i+1];
+            buffer[i] = buffer[i+1];
             i++;
-            c = f->data[i];
+            c = buffer[i];
         }
-        f->data[i-1] = '\0';
+        buffer[i-1] = '\0';
         f->size--;
         vga_clear();
         redraw();
@@ -142,11 +140,10 @@ void del(){
     }
 }
 
-
 void gotostrpos(){
     move(0,0,false);
     for(int i = 0; i < strpos; i++){
-        if(f->data[i] == '\n'){
+        if(buffer[i] == '\n'){
             printf("%c", '\n');
         }else{
             move(1,0,true);
@@ -165,11 +162,11 @@ void gotoline(int n){
         }
         else{
             move(1, 0, true); 
-            if(f->data[i] == '\n'){
+            if(buffer[i] == '\n'){
                 //if newline, get current cursor, go back to start at currentline+1
                 printf("\n");
                 lineindex++;
-            } if(f->data[i] == '\0'){
+            } if(buffer[i] == '\0'){
                 //reset current line
                 currentline--;
                 move(-1, 0, true);
@@ -192,21 +189,17 @@ void move(int x, int y, bool r){
     }
 }
 
-calculateline(int currentline){
-
-}
-
 void redraw(){
     vga_clear();
     move(0,0,false);
-    printf("%s", f->data);
+    printf("%s", buffer);
 }
 
 void parsectrl(char c){
-    if(c == 'C'){
-        //File saves automatically already :)     
-        //but lets implement anyway
-
+    if(c == 'S'){
+        ramfs_write(f, buffer, (strlen(buffer)+1));
+        move(0,24,false);
+        printf("Saved! ");
     }else if(c == 'Q'){
         exit = true;
     }

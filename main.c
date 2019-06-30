@@ -45,7 +45,8 @@ void main(void)
     //Make example file
     touch("lorem");
     struct file *f = ramfs_seek("lorem");
-    ramfs_write(f, "Dit is een test met een hele erge onwijs lange string maar echt eentje die heeeel erg lang is.\nHallo\nDag", 200); 
+    char *str = "Dit is een test met een hele erge onwijs lange string maar echt eentje die heeeel erg lang is.\nHallo\nDag";
+    ramfs_write(f, str, strlen(str)+1); 
 
 
     vga_clear();

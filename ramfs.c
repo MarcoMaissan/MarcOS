@@ -72,7 +72,6 @@ ssize_t ramfs_write(struct file *fp, const char *data, size_t n)
     strcpy(mem, data);
     fp->data = mem;
     fp->size = n;
-    printf("%s\n", mem);
 }
 
 /*
