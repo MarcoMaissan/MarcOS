@@ -4,29 +4,16 @@
 #include <sys/ps2.h>
 #include <ramfs.h>
 #include <editor.h>
-/*
- *
- * MarcOS
- * src/main.c
- *
- * Copyright (C) 2019 Marco Maissan
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
- * USA.
- *
- */
+
+//
+//
+//Marco Maissan
+//0949830
+//TI2B
+//
+//
+
+
 int stringlength = 0;
 int cursorposition = 0;
 
@@ -51,6 +38,7 @@ void main(void)
 
     vga_clear();
     prompt();
+    //Allocate terminal string size
     string = head = malloc(sizeof(char) * allocsize);
     buffersize = allocsize;
 
@@ -80,21 +68,25 @@ void main(void)
 }
 
 void insertchar(char c){
+    //Reallocate to fit string
     if(stringlength == buffersize-1){
         buffersize = buffersize+allocsize;
         string = (char*)realloc(string, buffersize);
     }
 
     int difference = stringlength-cursorposition; 
-
+    
+    //If at end of string
     if(difference == 0){
         string[stringlength] = c;
     }else{
+        //Otherwise insert inbetween and switch to right till end of aray
         for(int i = stringlength; i >= cursorposition; i--){
             string[i+1] = string[i];
         }
         string[cursorposition] = c;
     }
+    //Keep going till null character, and set cursor at right position...
     string[stringlength+1] = '\0';
     cursor = (struct vga_cursor){(-1*(cursorposition)), 0};
     vga_curset(cursor, true);
@@ -107,11 +99,14 @@ void insertchar(char c){
 
 void backspace(){
     if(cursorposition > 0){
+        //Only backspace if there are chars at all...
+        //Move all characters from cursorposition to the left one place
         for(int i = cursorposition-1; i < stringlength; i++){
             string[i] = string[i+1]; 
         }    
         string[stringlength-1] = NULL;
 
+        //Make sure to reposition the cursor correctly
         cursor = (struct vga_cursor){(-1*cursorposition) + stringlength,0};
         vga_curset(cursor, true);
         printf("\b");
@@ -119,8 +114,10 @@ void backspace(){
         cursor = (struct vga_cursor){(-1*stringlength)+1, 0};
         vga_curset(cursor, true);
 
+        //Redraw buffer
         printbuffer();
 
+        //Change variables accordingly
         stringlength--;
         cursorposition--;
 
@@ -134,6 +131,7 @@ void printbuffer(){
 }
 
 void prompt(){
+    //Prompt is the line to write
     printf("\nM> ");
     string[0] = '\0';
     cursorposition = 0;
@@ -141,6 +139,7 @@ void prompt(){
 }
 
 void clear(){
+    //Clear screen and write prompt
     vga_clear();
     prompt();
 }
@@ -205,6 +204,7 @@ void enter(){
 
 void echo()
 {
+    //Print each character which comes after "echo " till end of string
     printf("\n");
     for(int i = 0; i <= stringlength; i++){
         if(i >= 5) printf("%c", string[i]);
@@ -226,6 +226,7 @@ void parseansi(char x){
 }
 
 void debug_kernel(){
+    //DEBUG KERNEL WILL SHOW VARIABLES.
     //To debug kernel, show all allocated memory addresses and values
     struct block *temp = (void*)head - sizeof(struct block);
     printf("Address: %p, used: %d, size: %d\n", temp, temp->used, temp->size);

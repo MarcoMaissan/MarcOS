@@ -13,3 +13,10 @@ Ik gebruik de alloc method van opdracht 1 waardoor ik infinite (totdat het werkg
 
 Dit betekende ook dat ik de optionele realloc functie heb geimplementeerd.
 
+---------------------------------------
+OPMERKINGEN EINDOPDRACHT 
+
+Eindopdracht maakt gebruik van extra buffer waar de data eerst in wordt opgeslagen. 
+Per nieuwe character wordt direct nieuw geheugen geallocated. 
+Er worden dus dynamische buffers gebruikt via realloc waardoor oneindig lange strings mogelijk zijn.
+

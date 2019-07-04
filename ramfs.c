@@ -1,29 +1,13 @@
-/*
- *
- * BertOS - File System assignment
- * src/ramfs.c
- *
- * Copyright (C) 2019 Bastiaan Teeuwen <bastiaan@mkcl.nl>
- *
- * This program is free software; you can redistribute it and/or
- * modify it under the terms of the GNU General Public License
- * as published by the Free Software Foundation; either version 2
- * of the License, or (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
- * USA.
- *
- */
-
 #include <ramfs.h>
 #include <alloc.h>
+
+//
+//
+//Marco Maissan
+//0949830
+//TI2B
+//
+//
 
 static struct file *head;
 bool debugram = false;
@@ -31,6 +15,7 @@ bool debugram = false;
 /* Seek for files by 'name' */
 struct file *ramfs_seek(const char *name)
 {
+    //Go to head, compare string and return if strings are equal
     struct file *temp = head;
     while(temp != NULL){
         if(strcmp(temp->name, name) == 0){
@@ -140,12 +125,13 @@ void ls(){
     struct file *temp = head;
     while (temp != NULL){
         printf("\n%s",temp->name);
-        if(debugram) {printf("\nprev %p, mine %p, next %p",temp->prev, temp, temp->next);}
+        if(debugram) {printf("\nprev %p, mine %p, next %p",temp->prev, temp, temp->next);} //Debugging purposes...
         temp = temp->next;
     }   
 }
 
 void rm(char* file){
+    //Remove file command...
     struct file *f = ramfs_seek(file);
     if(f != NULL){
     ramfs_remove(f);
@@ -153,8 +139,12 @@ void rm(char* file){
 }
 
 void touch(const char *name){
+    //make new file with name
    if(ramfs_seek(name) == NULL){
     ramfs_create(name);
+    //find file and fill with empty data
+    struct file *f = ramfs_seek(name);
+    ramfs_write(f, "\0", sizeof("\0"));
    }else{
     printf("\nFile already exists!");
    }
@@ -163,6 +153,7 @@ void touch(const char *name){
 }
 
 void cat(const char *name){
+    //Display the contents of a file
     struct file *f = ramfs_seek(name);
     if(f != NULL){
        printf("\n%s", f->data);
@@ -170,6 +161,7 @@ void cat(const char *name){
 }
 
 void testdata(){
+    //enter some testdata to experiment with (accessed as "td" in terminal)
     printf("\n");
     struct file *f1 = ramfs_seek("c");
     ramfs_write(f1, "Heyyyy", sizeof("Heyyy")+1);
